@@ -33,12 +33,26 @@ jobs:
       - name: Create GitHub Release
         id: create_release
         run: |
-          REPO="bogey3/CBC-Padding-Oracle-Challenge"
+          REPO="${{ github.repository }}"
           VERSION="${GITHUB_REF_NAME}"
-          RESPONSE=$(curl -s -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
             -d '{"tag_name": "'"$VERSION"'", "name": "'"$VERSION"'", "body": "Release for version '"$VERSION"'"}' \
             "https://api.github.com/repos/$REPO/releases")
-          echo "release_id=$(echo $RESPONSE | jq -r .id)" >> $GITHUB_OUTPUT
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+          if [ "$HTTP_CODE" != "201" ]; then
+            echo "Failed to create release. HTTP code: $HTTP_CODE"
+            echo "Response: $BODY"
+            exit 1
+          fi
+          RELEASE_ID=$(echo "$BODY" | jq -r '.id')
+          if [ "$RELEASE_ID" == "null" ] || [ -z "$RELEASE_ID" ]; then
+            echo "Failed to parse release ID from response: $BODY"
+            exit 1
+          fi
+          echo "Created release with ID: $RELEASE_ID"
+          echo "release_id=$RELEASE_ID" >> $GITHUB_OUTPUT
 
       # Upload the compiled binary to the release
       - name: Upload Linux Binary
