@@ -1,0 +1,53 @@
+# AES-CBC Padding Oracle Challenge
+
+This is an AES-CBC padding oracle challenge server. The server uses AES-256-CBC encryption with PKCS7 padding and exposes a padding oracle vulnerability through its error responses.
+
+## API Endpoints
+
+### GET /challenge
+
+Returns an encrypted flag with a randomly generated IV and ciphertext.
+
+**Response:**
+```json
+{
+  "iv": "base64-encoded-iv",
+  "ciphertext": "base64-encoded-ciphertext"
+}
+```
+
+The flag is generated once at server startup and encrypted using AES-256-CBC, but encrypted with a new IV for each request.
+
+### POST /decrypt
+
+Attempts to decrypt the provided ciphertext, with the IV provided and the server key.
+
+**Request Body:**
+```json
+{
+  "iv": "base64-encoded-iv",
+  "ciphertext": "base64-encoded-ciphertext"
+}
+```
+
+**Responses:**
+- `200 OK` - Decryption successful (no response body)
+- `400 Bad Request` - Decryption error (invalid ciphertext structure or other decryption failure)
+  ```json
+  {"error": "Decryption error"}
+  ```
+- `500 Internal Server Error` - Padding error (invalid PKCS7 padding detected)
+  ```json
+  {"error": "Padding error"}
+  ```
+
+The server differentiates between padding errors and general decryption errors, which creates a padding oracle that can be exploited to decrypt the flag without knowing the encryption key.
+
+## Running the Server
+
+```bash
+go run main.go
+```
+
+The server runs on port 8000 by default. The generated flag is printed to stdout at startup.
+
