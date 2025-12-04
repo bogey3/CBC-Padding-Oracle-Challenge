@@ -38,7 +38,7 @@ jobs:
           RESPONSE=$(curl -s -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -d '{"tag_name": "'"$VERSION"'", "name": "'"$VERSION"'", "body": "Release for version '"$VERSION"'"}' \
             "https://api.github.com/repos/$REPO/releases")
-          echo "::set-output name=release_id::$(echo $RESPONSE | jq -r .id)"
+          echo "release_id=$(echo $RESPONSE | jq -r .id)" >> $GITHUB_OUTPUT
 
       # Upload the compiled binary to the release
       - name: Upload Linux Binary
