@@ -12,6 +12,8 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -57,19 +59,21 @@ jobs:
       # Upload the compiled binary to the release
       - name: Upload Linux Binary
         run: |
+          REPO="${{ github.repository }}"
           VERSION="${GITHUB_REF_NAME}"
           RELEASE_ID="${{ steps.create_release.outputs.release_id }}"
           curl -i -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Content-Type: application/octet-stream" \
             --data-binary @padding-oracle-server-linux \
-            "https://uploads.github.com/repos/bogey3/CBC-Padding-Oracle-Challenge/releases/$RELEASE_ID/assets?name=padding-oracle-server&label=Linux%20%28x64%29"
+            "https://uploads.github.com/repos/$REPO/releases/$RELEASE_ID/assets?name=padding-oracle-server&label=Linux%20%28x64%29"
 
       # Upload Windows binary to the release
       - name: Upload Windows binary
         run: |
+          REPO="${{ github.repository }}"
           VERSION="${GITHUB_REF_NAME}"
           RELEASE_ID="${{ steps.create_release.outputs.release_id }}"
           curl -i -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Content-Type: application/octet-stream" \
             --data-binary @padding-oracle-server-windows.exe \
-            "https://uploads.github.com/repos/bogey3/CBC-Padding-Oracle-Challenge/releases/$RELEASE_ID/assets?name=padding-oracle-server.exe&label=Windows%20%28x64%29"
+            "https://uploads.github.com/repos/$REPO/releases/$RELEASE_ID/assets?name=padding-oracle-server.exe&label=Windows%20%28x64%29"
