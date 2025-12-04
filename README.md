@@ -51,3 +51,6 @@ go run main.go
 
 The server runs on port 8000 by default. The generated flag is printed to stdout at startup.
 
+## Exploitation
+Here is a screencap of my test software using the padding oracle to decrypt the flag
+![screencapture](screencap.gif)
