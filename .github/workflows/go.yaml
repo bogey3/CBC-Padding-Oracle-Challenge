@@ -90,4 +90,4 @@ jobs:
           curl -i -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Content-Type: application/octet-stream" \
             --data-binary @padding-oracle-server-mac \
-            "https://uploads.github.com/repos/$REPO/releases/$RELEASE_ID/assets?name=padding-oracle-server&label=Mac%20OS%20%28arm64%29"
+            "https://uploads.github.com/repos/$REPO/releases/$RELEASE_ID/assets?name=padding-oracle-server-mac&label=Mac%20OS%20%28arm64%29"
