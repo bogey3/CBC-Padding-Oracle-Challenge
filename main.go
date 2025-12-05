@@ -34,6 +34,10 @@ type ErrorResponse struct {
 	Error string `json:"error"`
 }
 
+type VerifyRequest struct {
+	Flag string `json:"flag"`
+}
+
 func init() {
 	encryptionKey = make([]byte, keySize)
 	if _, err := rand.Read(encryptionKey); err != nil {
@@ -197,16 +201,36 @@ func decryptHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+func verifyHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req VerifyRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ErrorResponse{Error: "Invalid JSON"})
+	}
+
+	if req.Flag == serverFlag {
+		w.WriteHeader(http.StatusOK)
+	} else {
+		w.WriteHeader(http.StatusForbidden)
+	}
+}
+
 func main() {
 	ip := flag.String("ip", "127.0.0.1", "IP address to bind to")
 	port := flag.String("port", "8000", "Port to listen on")
 	flag.Parse()
 
 	serverFlag = generateRandomFlag()
-	fmt.Printf("Generated flag: %s\n", serverFlag)
 
 	http.HandleFunc("/challenge", challengeHandler)
 	http.HandleFunc("/decrypt", decryptHandler)
+	http.HandleFunc("/verify", verifyHandler)
 
 	addr := fmt.Sprintf("%s:%s", *ip, *port)
 	log.Printf("Server starting on %s", addr)

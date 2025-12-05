@@ -43,6 +43,21 @@ Attempts to decrypt the provided ciphertext, with the IV provided and the server
 
 The server differentiates between padding errors and general decryption errors, which creates a padding oracle that can be exploited to decrypt the flag without knowing the encryption key.
 
+### POST /verify
+
+This endpoint can be used to verify the decrypted flag matches the plaintext on the server.
+
+**Request Body:**
+```json
+{
+  "flag": "flag-string"
+}
+```
+
+**Responses:**
+- `200 OK` - Congratulations, the flag matches, you have successfully decrypted the ciphertext
+- `403 Forbidden` - Your provided plaintext does not match the value on the server
+
 ## Running the Server
 
 ```bash
