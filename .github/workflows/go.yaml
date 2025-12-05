@@ -28,6 +28,9 @@ jobs:
       - name: Build Windows
         run: GOOS=windows GOARCH=amd64 go build -o padding-oracle-server-windows.exe -ldflags "-w -s" -v ./...
 
+      - name: Build Mac
+        run: GOOS=darwin GOARCH=arm64 go build -o padding-oracle-server-mac -ldflags "-w -s" -v ./...
+
       - name: Test
         run: go test -v ./...
 
@@ -77,3 +80,14 @@ jobs:
             -H "Content-Type: application/octet-stream" \
             --data-binary @padding-oracle-server-windows.exe \
             "https://uploads.github.com/repos/$REPO/releases/$RELEASE_ID/assets?name=padding-oracle-server.exe&label=Windows%20%28x64%29"
+
+      # Upload Windows binary to the release
+      - name: Upload Mac binary
+        run: |
+          REPO="${{ github.repository }}"
+          VERSION="${GITHUB_REF_NAME}"
+          RELEASE_ID="${{ steps.create_release.outputs.release_id }}"
+          curl -i -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary @padding-oracle-server-mac \
+            "https://uploads.github.com/repos/$REPO/releases/$RELEASE_ID/assets?name=padding-oracle-server&label=Mac%20OS%20%28arm64%29"
