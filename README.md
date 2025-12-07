@@ -58,13 +58,6 @@ This endpoint can be used to verify the decrypted flag matches the plaintext on 
 - `200 OK` - Congratulations, the flag matches, you have successfully decrypted the ciphertext
 - `403 Forbidden` - Your provided plaintext does not match the value on the server
 
-## Running the Server
-
-```bash
-go run main.go
-```
-
-The server runs on port 8000 by default. The generated flag is printed to stdout at startup.
 
 ## Exploitation
 Here is a screencap of my test software using the padding oracle to decrypt the flag
